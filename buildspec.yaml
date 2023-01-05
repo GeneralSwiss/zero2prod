@@ -4,8 +4,8 @@ phases:
   install:
     commands:
       - echo Entered Install phase...
-      - apt update -y
-      - apt install -y cargo
+      - yum update -y
+      - yum install -y cargo
   build:
     commands:
       - echo Entered the build phase...
