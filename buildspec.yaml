@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Entered Install phase...
+      - apt-get update -y
+      - apt-get install -y cargo
+  build:
+    commands:
+      - echo Entered the build phase...
+      - echo Build started on `date`
+      - cargo test
+      - cargo build --release
+artifacts:
+  files:
+    - target/release/zero2prod
+  discard-paths: yes
