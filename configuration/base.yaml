@@ -1,6 +1,9 @@
 ---
 application:
   port: 8000
+email_client:
+  base_url: localhost
+  sender_email: qojqeu+avn8w9s4vbpt0@sharklasers.com
 database:
   host: 127.0.0.1
   port: 5432

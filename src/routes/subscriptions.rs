@@ -1,3 +1,4 @@
+use crate::domain::Subscriber;
 use actix_web::{web, HttpResponse, Responder};
 use chrono::Utc;
 use sqlx::PgPool;
@@ -5,17 +6,17 @@ use uuid::Uuid;
 
 #[tracing::instrument(
     name = "Adding a new subscriber",
-    skip(form, connection_pool),
+    skip(subscriber, connection_pool),
     fields(
-        subscriber_email = %form.email,
-        subscriber_name = %form.name,
+        subscriber_email = %subscriber.email.as_ref(),
+        subscriber_name = %subscriber.name.as_ref(),
     )
 )]
 pub async fn subscribe(
-    form: web::Form<Subscriber>,
+    subscriber: web::Form<Subscriber>,
     connection_pool: web::Data<PgPool>,
 ) -> impl Responder {
-    match insert_subscriber(connection_pool.get_ref(), &form).await {
+    match insert_subscriber(connection_pool.get_ref(), &subscriber).await {
         Ok(_) => HttpResponse::Ok(),
         Err(_) => HttpResponse::InternalServerError(),
     }
@@ -28,12 +29,12 @@ pub async fn subscribe(
 pub async fn insert_subscriber(pool: &PgPool, subscriber: &Subscriber) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"
-        INSERT INTO subscriptions (id, email, name, subscribed_at)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO subscriptions (id, email, name, subscribed_at, status)
+        VALUES ($1, $2, $3, $4, 'confirmed')
         "#,
         Uuid::new_v4(),
-        subscriber.email,
-        subscriber.name,
+        subscriber.email.as_ref(),
+        subscriber.name.as_ref(),
         Utc::now()
     )
     .execute(pool)
@@ -43,10 +44,4 @@ pub async fn insert_subscriber(pool: &PgPool, subscriber: &Subscriber) -> Result
         e
     })?;
     Ok(())
-}
-
-#[derive(serde::Deserialize)]
-pub struct Subscriber {
-    name: String,
-    email: String,
 }

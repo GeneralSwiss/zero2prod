@@ -1,5 +1,8 @@
 ---
 application:
   host: 0.0.0.0
+email_client:
+  base_url: api.some-esp.com
+  sender_email: prod@gmail.com
 database:
   require_ssl: true
